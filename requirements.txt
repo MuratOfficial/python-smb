@@ -1,0 +1,4 @@
+flask>=2.0.0
+werkzeug>=2.0.0
+smbprotocol>=1.10.0
+python-dotenv>=0.19.0

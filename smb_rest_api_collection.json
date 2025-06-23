@@ -1,0 +1,382 @@
+{
+  "info": {
+    "name": "SMB REST API",
+    "description": "Complete collection of SMB REST API endpoints with examples",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Check if the API service is running and healthy"
+      },
+      "response": [
+        {
+          "name": "Successful Health Check",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"healthy\",\n  \"service\": \"SMB REST API\",\n  \"timestamp\": \"2025-06-17T10:30:00.123456\",\n  \"smb_initialized\": true\n}"
+        }
+      ]
+    },
+    {
+      "name": "Test SMB Connection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/smb/test",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "test"]
+        },
+        "description": "Test the SMB connection to verify credentials and network connectivity"
+      },
+      "response": [
+        {
+          "name": "Successful Connection Test",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"message\": \"SMB connection successful\"\n}"
+        },
+        {
+          "name": "Failed Connection Test",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"status\": \"error\",\n  \"error\": \"Connection failed: Authentication error\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Files",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/smb/files?path=/documents",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "files"],
+          "query": [
+            {
+              "key": "path",
+              "value": "/documents",
+              "description": "Remote directory path to list (optional, defaults to root)"
+            }
+          ]
+        },
+        "description": "List files and directories in the specified SMB share path"
+      },
+      "response": [
+        {
+          "name": "Successful File Listing",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"files\": [\n    {\n      \"name\": \"document1.pdf\",\n      \"type\": \"file\",\n      \"size\": 1024576,\n      \"modified\": \"2025-06-17T09:30:00\"\n    },\n    {\n      \"name\": \"subfolder\",\n      \"type\": \"directory\",\n      \"modified\": \"2025-06-16T14:20:00\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Upload File (Multipart)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": [],
+              "description": "File to upload"
+            },
+            {
+              "key": "remote_path",
+              "value": "/uploads/myfile.txt",
+              "type": "text",
+              "description": "Remote path where file should be saved (optional, defaults to filename)"
+            },
+            {
+              "key": "create_dirs",
+              "value": "true",
+              "type": "text",
+              "description": "Whether to create directories if they don't exist (default: true)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/smb/upload",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "upload"]
+        },
+        "description": "Upload a file to SMB share using multipart form data"
+      },
+      "response": [
+        {
+          "name": "Successful Upload",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"remote_path\": \"/uploads/myfile.txt\",\n  \"message\": \"File uploaded successfully\",\n  \"size\": 1024\n}"
+        }
+      ]
+    },
+    {
+      "name": "Upload File (JSON Base64)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"filename\": \"sample.txt\",\n  \"file_data\": \"SGVsbG8gV29ybGQhIFRoaXMgaXMgYSB0ZXN0IGZpbGUu\",\n  \"remote_path\": \"/uploads/sample.txt\",\n  \"create_dirs\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/smb/upload",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "upload"]
+        },
+        "description": "Upload a file to SMB share using JSON with base64 encoded content"
+      },
+      "response": [
+        {
+          "name": "Successful JSON Upload",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"remote_path\": \"/uploads/sample.txt\",\n  \"message\": \"File uploaded successfully\",\n  \"size\": 26\n}"
+        }
+      ]
+    },
+    {
+      "name": "Download File (GET with file return)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/smb/download?path=/uploads/sample.txt&return_file=true",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "download"],
+          "query": [
+            {
+              "key": "path",
+              "value": "/uploads/sample.txt",
+              "description": "Remote file path to download"
+            },
+            {
+              "key": "return_file",
+              "value": "true",
+              "description": "If true, returns file directly; if false, returns base64 encoded content"
+            }
+          ]
+        },
+        "description": "Download a file from SMB share - returns file directly for download"
+      },
+      "response": [
+        {
+          "name": "File Download",
+          "status": "OK",
+          "code": 200,
+          "body": "[Binary file content]"
+        }
+      ]
+    },
+    {
+      "name": "Download File (GET with base64)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/smb/download?path=/uploads/sample.txt&return_file=false",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "download"],
+          "query": [
+            {
+              "key": "path",
+              "value": "/uploads/sample.txt",
+              "description": "Remote file path to download"
+            },
+            {
+              "key": "return_file",
+              "value": "false",
+              "description": "Returns base64 encoded content in JSON response"
+            }
+          ]
+        },
+        "description": "Download a file from SMB share - returns base64 encoded content in JSON"
+      },
+      "response": [
+        {
+          "name": "Base64 Download",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"file_data\": \"SGVsbG8gV29ybGQhIFRoaXMgaXMgYSB0ZXN0IGZpbGUu\",\n  \"encoding\": \"base64\",\n  \"message\": \"File downloaded successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Download File (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"remote_path\": \"/uploads/sample.txt\",\n  \"return_file\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/smb/download",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "download"]
+        },
+        "description": "Download a file from SMB share using POST with JSON body"
+      },
+      "response": [
+        {
+          "name": "POST Download Success",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"file_data\": \"SGVsbG8gV29ybGQhIFRoaXMgaXMgYSB0ZXN0IGZpbGUu\",\n  \"encoding\": \"base64\",\n  \"message\": \"File downloaded successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete File (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/smb/delete?path=/uploads/sample.txt",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "delete"],
+          "query": [
+            {
+              "key": "path",
+              "value": "/uploads/sample.txt",
+              "description": "Remote file path to delete"
+            }
+          ]
+        },
+        "description": "Delete a file from SMB share using DELETE method"
+      },
+      "response": [
+        {
+          "name": "Delete Not Implemented",
+          "status": "Not Implemented",
+          "code": 501,
+          "body": "{\n  \"status\": \"error\",\n  \"error\": \"Delete functionality not yet implemented in SMB service\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete File (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"remote_path\": \"/uploads/sample.txt\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/smb/delete",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "delete"]
+        },
+        "description": "Delete a file from SMB share using POST with JSON body"
+      },
+      "response": [
+        {
+          "name": "Delete Not Implemented",
+          "status": "Not Implemented",
+          "code": 501,
+          "body": "{\n  \"status\": \"error\",\n  \"error\": \"Delete functionality not yet implemented in SMB service\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Create Directory",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"remote_path\": \"/new-folder/subfolder\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/smb/mkdir",
+          "host": ["{{base_url}}"],
+          "path": ["smb", "mkdir"]
+        },
+        "description": "Create a directory on the SMB share"
+      },
+      "response": [
+        {
+          "name": "Directory Created",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"status\": \"success\",\n  \"remote_path\": \"smb://server/share/new-folder/subfolder\",\n  \"message\": \"Directory created successfully\"\n}"
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script for the entire collection",
+          "console.log('Making request to SMB REST API');"
+        ]
+      }
+    }
+  ]
+}
