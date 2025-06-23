@@ -1,6 +1,13 @@
-# 🔐 python-smb
+<h1 align="center">🔐 python-smb</h1>
+<p align="center">
+  Это лёгкий веб-инструмент на основе **Flask**, позволяющий подключаться к SMB/CIFS-шаре и выполнять базовые операции с файлами.
+</p>
 
-**python-smb** — это лёгкий веб-инструмент на основе **Flask**, позволяющий подключаться к SMB/CIFS-шаре и выполнять базовые операции с файлами.
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/MuratOfficial/python-smb?style=flat-square" />
+  <img src="https://img.shields.io/github/license/MuratOfficial/python-smb?style=flat-square" />
+  <img src="https://img.shields.io/github/stars/MuratOfficial/python-smb?style=flat-square" />
+</p>
 
 ---
 
